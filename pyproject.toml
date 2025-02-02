@@ -1,0 +1,35 @@
+[project]
+name = "click_with_alias"
+version = "1.0.0"
+description = "Easily add aliases to your Click groups and commands."
+authors = [
+    { name = "Marcus Fredriksson", email = "marcus@marcusfredriksson.com" },
+]
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+readme = "README.md"
+dependencies = ["click>=8.1.8"]
+
+[project.optional-dependencies]
+dev = [
+    "black>=24.10.0",
+    "pytest>=8.3.4",
+    "isort>=5.13.2",
+    "pylint>=3.3.2",
+    "pre-commit>=4.0.1",
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["click_with_alias"]
+
+[tool.black]
+line-length = 80
+target-version = ['py311']
+
+[tool.isort]
+profile = "black"
+line_length = 80
