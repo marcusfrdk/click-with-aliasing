@@ -11,7 +11,8 @@ def command(
     name: str, *args, aliases: list[str] = None, **kwargs
 ) -> click.Command:
     """
-    The command decorator with aliasing support which replaces the default Click command decorator.
+    The command decorator with aliasing support which
+    replaces the default Click command decorator.
 
     Usage:
         @command(name="my_command)

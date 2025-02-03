@@ -1,14 +1,20 @@
 [project]
-name = "click_with_alias"
+name = "click_with_aliasing"
 version = "1.0.0"
 description = "Easily add aliases to your Click groups and commands."
 authors = [
     { name = "Marcus Fredriksson", email = "marcus@marcusfredriksson.com" },
 ]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
 license = { file = "LICENSE" }
 requires-python = ">=3.11"
 readme = "README.md"
 dependencies = ["click>=8.1.8"]
+keywords = ["click", "alias", "group", "command"]
 
 [project.optional-dependencies]
 dev = [
@@ -24,7 +30,8 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["click_with_alias"]
+packages = ["click_with_aliasing"]
+py-modules = ["cwa"]
 
 [tool.black]
 line-length = 80
@@ -33,3 +40,7 @@ target-version = ['py311']
 [tool.isort]
 profile = "black"
 line_length = 80
+
+[project.urls]
+Homepage = "https://github.com/marcusfrdk/click-with-aliasing"
+Issues = "https://github.com/marcusfrdk/click-with-aliasing/issues"
