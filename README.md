@@ -8,7 +8,7 @@
 ![PyPI](https://img.shields.io/pypi/v/click-with-aliasing)
 ![License](https://img.shields.io/github/license/marcusfrdk/click-with-aliasing)
 
-This is a project that adds decorators that replaces the default `click.group` and `click.command` decorators with custom ones that support aliasing.
+This is a project that adds decorators that wraps the default `click.group` and `click.command` decorators with custom ones that support aliasing.
 
 ## Installation
 
@@ -51,6 +51,8 @@ def my_command():
 ```
 
 Like the group, you can call the command using either `my_command` or `mc`.
+
+You can now call the command using `mg mc` or any combination of the aliases.
 
 ## License
 
