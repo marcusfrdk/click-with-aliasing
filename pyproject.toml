@@ -1,6 +1,6 @@
 [project]
 name = "click_with_aliasing"
-version = "1.0.0"
+version = "1.0.1"
 description = "Easily add aliases to your Click groups and commands."
 authors = [
     { name = "Marcus Fredriksson", email = "marcus@marcusfredriksson.com" },
@@ -17,6 +17,7 @@ dependencies = ["click>=8.1.8"]
 keywords = ["click", "alias", "group", "command"]
 
 [project.optional-dependencies]
+build = ["build", "twine"]
 dev = [
     "black>=24.10.0",
     "pytest>=8.3.4",
@@ -44,3 +45,4 @@ line_length = 80
 [project.urls]
 Homepage = "https://github.com/marcusfrdk/click-with-aliasing"
 Issues = "https://github.com/marcusfrdk/click-with-aliasing/issues"
+Repository = "https://github.com/marcusfrdk/click-with-aliasing"

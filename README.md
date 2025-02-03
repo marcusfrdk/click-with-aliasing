@@ -31,10 +31,13 @@ Here is an example of how to use the `group` decorator:
 
 ```python
 from click_with_aliasing import group
+from .my_command import my_command
 
 @group(name="my_group", aliases=['mg'])
 def cli():
     """ My Click group """
+
+cli.add_command(my_command)
 ```
 
 This group works exactly like a normal `click.group`, but while using the CLI, you can use either `my_group` or `mg` to call the group.
