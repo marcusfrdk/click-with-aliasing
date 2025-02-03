@@ -6,10 +6,7 @@
 ![issues](https://img.shields.io/github/issues/marcusfrdk/click-with-aliasing)
 ![contributors](https://img.shields.io/github/contributors/marcusfrdk/click-with-aliasing)
 ![PyPI](https://img.shields.io/pypi/v/click-with-aliasing)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/click-with-aliasing)
 ![License](https://img.shields.io/github/license/marcusfrdk/click-with-aliasing)
-![Build Status](https://img.shields.io/travis/com/marcusfrdk/click-with-aliasing)
-![Coverage](https://img.shields.io/codecov/c/github/marcusfrdk/click-with-aliasing)
 
 This is a project that adds decorators that replaces the default `click.group` and `click.command` decorators with custom ones that support aliasing.
 
