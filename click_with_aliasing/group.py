@@ -1,5 +1,7 @@
 """ The group decorator with alias support. """
 
+from typing import Any, Callable
+
 import click
 
 from ._aliased_group import AliasedGroup
@@ -7,7 +9,7 @@ from ._aliased_group import AliasedGroup
 
 def group(
     *args, name: str = None, aliases: list[str] = None, **kwargs
-) -> click.Group:
+) -> Callable[[Callable], click.Group]:
     """
     The group decorator with aliasing support
     which replaces the default Click group decorator.
@@ -22,7 +24,7 @@ def group(
         *args: Any - Additional arguments.
         **kwargs: Any - Additional keyword arguments.
     Returns:
-        click.Group - The Click group decorator.
+        Callable[[Callable], click.Group] - The Click group decorator.
     Raises:
         None
     """

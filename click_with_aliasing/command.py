@@ -9,7 +9,7 @@ from ._aliased_command import AliasedCommand
 
 def command(
     name: str, *args, aliases: list[str] = None, **kwargs
-) -> click.Command:
+) -> Callable[[Callable], click.Command]:
     """
     The command decorator with aliasing support which
     replaces the default Click command decorator.
@@ -24,7 +24,7 @@ def command(
         *args: Any - Additional arguments.
         **kwargs: Any - Additional keyword arguments.
     Returns:
-        click.Command - The Click command decorator.
+        Callable[[Callable], click.Command] - The Click command decorator.
     Raises:
         None
     """
