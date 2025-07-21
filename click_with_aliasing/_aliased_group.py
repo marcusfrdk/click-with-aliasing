@@ -1,4 +1,6 @@
-""" AliasedGroup class for click_with_alias. """
+"""AliasedGroup class for click_with_alias."""
+
+from typing import Optional
 
 import click
 
@@ -6,13 +8,19 @@ import click
 class AliasedGroup(click.Group):
     """A Click group that supports aliasing."""
 
-    def add_command(self, cmd: click.Command, name=None) -> None:
+    def __init__(self, *args, **kwargs):
+        self.aliases = kwargs.pop("aliases", [])
+        super().__init__(*args, **kwargs)
+
+    def add_command(
+        self, cmd: click.Command, name: Optional[str] = None
+    ) -> None:
         """
         Add a command to the group.
 
         Args:
-            cmd: click.Command - The command to add.
-            name: str - The name of the command.
+            cmd (click.Command): The command to add.
+            name (Optional[str]): The name of the command.
         Returns:
             None
         Raises:
@@ -30,8 +38,8 @@ class AliasedGroup(click.Group):
         Format the commands for the group.
 
         Args:
-            ctx: click.Context - The click context.
-            formatter: click.HelpFormatter - The help formatter.
+            ctx (click.Context): The click context.
+            formatter (click.HelpFormatter): The help formatter.
         Returns:
             None
         Raises:

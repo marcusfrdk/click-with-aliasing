@@ -32,7 +32,6 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 packages = ["click_with_aliasing"]
-py-modules = ["cwa"]
 
 [tool.black]
 line-length = 80

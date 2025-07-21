@@ -1,6 +1,6 @@
 """The command decorator with alias support."""
 
-from typing import Callable
+from typing import Callable, List, Optional
 
 import click
 
@@ -8,23 +8,23 @@ from ._aliased_command import AliasedCommand
 
 
 def command(
-    name: str, *args, aliases: list[str] = None, **kwargs
+    name: str, *args, aliases: Optional[List[str]] = None, **kwargs
 ) -> Callable[[Callable], click.Command]:
     """
     The command decorator with aliasing support which
     replaces the default Click command decorator.
 
     Usage:
-        @command(name="my_command)
+        @command(name="my_command")
 
-        @command(name="my_command), aliases=["mc])
+        @command(name="my_command", aliases=["mc"])
     Args:
-        name: str - The name of the command.
-        aliases: list[str] - The list of aliases for the command.
-        *args: Any - Additional arguments.
-        **kwargs: Any - Additional keyword arguments.
+        name (str): The name of the command.
+        aliases (Optional[List[str]]): The list of aliases for the command.
+        *args (Any): Additional arguments.
+        **kwargs (Any): Additional keyword arguments.
     Returns:
-        Callable[[Callable], click.Command] - The Click command decorator.
+        Callable[[Callable], click.Command]: The Click command decorator.
     Raises:
         None
     """
