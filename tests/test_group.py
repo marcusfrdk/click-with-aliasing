@@ -1,6 +1,6 @@
-""" Tests for the group decorator. """
+"""Tests for the group decorator."""
 
-# pylint: disable=W0621
+import asyncio
 
 import click
 import pytest
@@ -9,18 +9,20 @@ from click.testing import CliRunner
 from click_with_aliasing import command, group
 
 
-@command(name="test_command", aliases=["tc", "tcmd"])
-def cmd():
-    """A simple test command."""
-    click.echo("Test command executed")
+@command(name="async_cmd", aliases=["ac"])
+async def async_command():
+    """An async command for testing."""
+    await asyncio.sleep(0.1)
+    click.echo("Async command ran")
 
 
-@group(name="test_group", aliases=["tg", "tgrp"])
-def grp():
-    """A simple test group."""
+@group(name="async_grp", aliases=["ag"])
+async def async_group():
+    """An async group for testing."""
+    await asyncio.sleep(0.1)
 
 
-grp.add_command(cmd)
+async_group.add_command(async_command)
 
 
 @pytest.fixture
@@ -29,27 +31,35 @@ def runner():
     return CliRunner()
 
 
-def test_group_name():
-    """Test that the group name is correctly assigned."""
-    assert grp.name == "test_group"
+class TestAsyncCommand:
+    """Test class for async command functionality."""
 
+    def test_async_command_wrapping(self):
+        """Test that async commands are properly wrapped."""
+        assert not asyncio.iscoroutinefunction(async_command.callback)
 
-def test_group_aliases():
-    """Test that aliases are correctly assigned to the group."""
-    assert hasattr(grp, "aliases")
-    assert grp.aliases == ["tg", "tgrp"]
-
-
-def test_group_command_execution(runner: CliRunner):
-    """Test that the command within the group runs successfully."""
-    result = runner.invoke(grp, ["test_command"])
-    assert result.exit_code == 0
-    assert "Test command executed" in result.output
-
-
-def test_group_command_alias_execution(runner: CliRunner):
-    """Test that the command within the group executes via its alias."""
-    for alias in ["tc", "tcmd"]:
-        result = runner.invoke(grp, [alias])
+    def test_async_command_execution(self, runner: CliRunner):
+        """Test async command execution."""
+        result = runner.invoke(async_group, ["async_cmd"])
         assert result.exit_code == 0
-        assert "Test command executed" in result.output
+        assert "Async command ran" in result.output
+
+    def test_async_command_alias_execution(self, runner: CliRunner):
+        """Test async command execution via alias."""
+        result = runner.invoke(async_group, ["ac"])
+        assert result.exit_code == 0
+        assert "Async command ran" in result.output
+
+
+class TestAsyncGroup:
+    """Test class for async group functionality."""
+
+    def test_async_group_wrapping(self):
+        """Test that async groups are properly wrapped."""
+        assert not asyncio.iscoroutinefunction(async_group.callback)
+
+    def test_async_group_help(self, runner: CliRunner):
+        """Test async group help functionality."""
+        result = runner.invoke(async_group, ["--help"])
+        assert result.exit_code == 0
+        assert "async_cmd" in result.output

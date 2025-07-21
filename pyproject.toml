@@ -53,6 +53,7 @@ disable = [
     "E1101", # no-member
     "W0613", # unused-argument
     "W0401", # wildcard-import
+    "W0621", # redefined-outer-name
 ]
 
 [tool.pylint.format]
