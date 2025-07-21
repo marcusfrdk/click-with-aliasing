@@ -63,3 +63,17 @@ class TestAsyncGroup:
         result = runner.invoke(async_group, ["--help"])
         assert result.exit_code == 0
         assert "async_cmd" in result.output
+
+
+def test_add_regular_click_command_to_aliased_group():
+    """Test that regular Click commands can be added to AliasedGroup."""
+
+    @group(name="test_group")
+    def test_grp():
+        pass
+
+    @click.command()
+    def regular_cmd():
+        """A regular Click command."""
+
+    test_grp.add_command(regular_cmd)
