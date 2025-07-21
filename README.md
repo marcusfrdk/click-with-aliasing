@@ -7,6 +7,8 @@
 ![contributors](https://img.shields.io/github/contributors/marcusfrdk/click-with-aliasing)
 ![PyPI](https://img.shields.io/pypi/v/click-with-aliasing)
 ![License](https://img.shields.io/github/license/marcusfrdk/click-with-aliasing)
+![Downloads](https://static.pepy.tech/badge/click-with-aliasing)
+![Monthly Downloads](https://static.pepy.tech/badge/click-with-aliasing/month)
 
 This is a project that adds decorators that wraps the default `click.group` and `click.command` decorators with custom ones that support aliasing.
 
@@ -18,7 +20,7 @@ You can install the package from [PyPI](https://pypi.org/project/click-with-alia
 pip install click-with-aliasing
 ```
 
-The package is available for Python 3.11 and newer.
+The package is available for Python 3.10 and newer.
 
 ## Usage
 
@@ -30,7 +32,7 @@ Here is an example of how to use the `group` decorator:
 from click_with_aliasing import group
 from .my_command import my_command
 
-@group(name="my_group", aliases=['mg'])
+@group(name="my_group", aliases=["mg"])
 def cli():
     """ My Click group """
 
@@ -44,7 +46,7 @@ The same works for the `command` decorator:
 ```python
 from click_with_aliasing import command
 
-@command(name="my_command", aliases=['mc'])
+@command(name="my_command", aliases=["mc"])
 def my_command():
     """ My Click command """
     ...

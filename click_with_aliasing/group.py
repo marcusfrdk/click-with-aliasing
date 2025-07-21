@@ -1,6 +1,6 @@
-""" The group decorator with alias support. """
+"""The group decorator with alias support."""
 
-from typing import Any, Callable
+from typing import Callable
 
 import click
 

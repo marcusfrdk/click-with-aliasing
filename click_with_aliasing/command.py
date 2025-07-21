@@ -1,4 +1,4 @@
-""" The command decorator with alias support. """
+"""The command decorator with alias support."""
 
 from typing import Callable
 
