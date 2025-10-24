@@ -10,16 +10,26 @@
 ![Downloads](https://static.pepy.tech/badge/click-with-aliasing)
 ![Monthly Downloads](https://static.pepy.tech/badge/click-with-aliasing/month)
 
-A powerful extension for [Click](https://click.palletsprojects.com/) that adds **command and group aliasing** support with **automatic async function handling**.
+A powerful extension for [Click](https://click.palletsprojects.com/) that adds **command and group aliasing** support with **automatic async function handling** and **advanced parameter validation**.
 
 ## Features
 
--   **Command Aliases**: Create multiple names for your commands
--   **Group Aliases**: Add aliases to command groups
--   **Automatic Async Support**: Seamlessly handle async functions without extra configuration
--   **Drop-in Replacement**: Works exactly like standard Click decorators
--   **Type Safe**: Full type hints support with proper IDE integration
--   **Help Integration**: Aliases automatically appear in help text
+- **Command Aliases**: Create multiple names for your commands
+- **Group Aliases**: Add aliases to command groups
+- **Enhanced Options & Arguments**: Mutual exclusivity, requirements, and group constraints
+- **Validation Rules**: Group-level validation with multiple modes (all_or_none, at_least, at_most, exactly)
+- **Automatic Async Support**: Seamlessly handle async functions without extra configuration
+- **Drop-in Replacement**: Works exactly like standard Click decorators
+- **Type Safe**: Full type hints support with proper IDE integration
+- **Help Integration**: Aliases automatically appear in help text
+
+## Documentation
+
+- **[Command](docs/COMMAND.md)** - Command decorator with aliasing support
+- **[Group](docs/GROUP.md)** - Group decorator for organizing commands
+- **[Option](docs/OPTION.md)** - Enhanced options with mutual exclusivity and requirements
+- **[Argument](docs/ARGUMENT.md)** - Enhanced arguments with validation constraints
+- **[Rule](docs/RULE.md)** - Group-level validation rules for complex parameter logic
 
 ## Installation
 
@@ -76,6 +86,57 @@ my-cli db m              # Using aliases
 my-cli database m        # Mixed usage
 ```
 
+### Enhanced Options with Validation
+
+```python
+from click_with_aliasing import command, option
+
+@command(name="auth")
+@option("--username", requires=["password"], mutually_exclusive=["token"])
+@option("--password", requires=["username"], mutually_exclusive=["token"])
+@option("--token", mutually_exclusive=["username", "password"])
+def auth(username, password, token):
+    """Authenticate with username/password or token"""
+    if token:
+        print("Authenticating with token")
+    elif username and password:
+        print(f"Authenticating as {username}")
+```
+
+Usage:
+
+```bash
+my-cli auth --token abc123                          # Valid
+my-cli auth --username admin --password secret      # Valid
+my-cli auth --username admin                        # Error: requires password
+my-cli auth --token abc123 --username admin         # Error: mutually exclusive
+```
+
+### Validation Rules
+
+```python
+from click_with_aliasing import command, option, rule
+
+@command(name="deploy")
+@option("--production", is_flag=True)
+@option("--staging", is_flag=True)
+@option("--development", is_flag=True)
+@rule(["production", "staging", "development"], mode="exactly", count=1)
+def deploy(production, staging, development):
+    """Deploy to exactly one environment"""
+    env = "production" if production else "staging" if staging else "development"
+    print(f"Deploying to {env}")
+```
+
+Usage:
+
+```bash
+my-cli deploy --production                          # Valid
+my-cli deploy --staging                             # Valid
+my-cli deploy --production --staging                # Error: exactly 1 required
+my-cli deploy                                        # Error: exactly 1 required
+```
+
 ## Async Support
 
 The library automatically detects and handles async functions, meaning no extra configuration is needed.
@@ -112,100 +173,56 @@ async def start_server():
 api_group.add_command(start_server)
 ```
 
-## Complete Example
+## Key Concepts
 
-Here's a full CLI application demonstrating all features:
+### Command & Group Aliases
+
+Add multiple names to commands and groups for convenience:
 
 ```python
-import asyncio
-import click
-from click_with_aliasing import group, command
-
-@group(name="myapp", aliases=["app"])
-def cli():
-    """My Application CLI"""
-    pass
-
-@group(name="database", aliases=["db"])
-async def database():
-    """Database management commands"""
-    await asyncio.sleep(0.1)  # Simulate async setup
-
-@command(name="migrate", aliases=["m", "mig"])
-async def migrate():
-    """Run database migrations"""
-    print("Running migrations...")
-    await asyncio.sleep(1)
-    print("Migrations completed!")
-
-@command(name="seed", aliases=["s"])
-def seed():
-    """Seed the database"""
-    print("Seeding database...")
-
-@command(name="start", aliases=["run", "serve"])
-def start():
-    """Start the application server"""
-    print("Starting server on port 8000...")
-
-@command(name="stop", aliases=["kill"])
-def stop():
-    """Stop the application server"""
-    print("Stopping server...")
-
-database.add_command(migrate)
-database.add_command(seed)
-cli.add_command(database)
-cli.add_command(start)
-cli.add_command(stop)
-
-if __name__ == "__main__":
-    cli()
+@command(name="deploy", aliases=["d", "dep"])
+@group(name="database", aliases=["db", "d"])
 ```
 
-Usage examples:
+### Option Validation
 
-```bash
-python myapp.py database migrate
-python myapp.py db m
-python myapp.py database mig
+**Mutual Exclusivity**: Only one option from a set can be used
 
-python myapp.py start
-python myapp.py stop
-
-python myapp.py --help
-python myapp.py db --help
+```python
+@option("--json", mutually_exclusive=["xml", "yaml"])
 ```
 
-## API Reference
+**Requirements**: Options that must be used together
 
-### `@command(name, *, aliases=None, **kwargs)`
+```python
+@option("--username", requires=["password"])
+```
 
-Creates a command with optional aliases.
+**Group Constraints**: Organize options and apply constraints collectively
 
-**Parameters:**
+```python
+@option("--json", group="format", group_mutually_exclusive=["output"])
+```
 
--   `name` (str): Primary command name
--   `aliases` (List[str], optional): List of alternative names
--   `**kwargs`: Additional arguments passed to `click.command()`
+### Validation Rules
 
-**Returns:** `AliasedCommand` instance
+Apply group-level validation with different modes:
 
-### `@group(name=None, *, aliases=None, **kwargs)`
+- **all_or_none**: All parameters or none
+- **at_least**: Minimum number required
+- **at_most**: Maximum number allowed
+- **exactly**: Exact number required
 
-Creates a command group with optional aliases.
-
-**Parameters:**
-
--   `name` (str, optional): Group name (defaults to function name)
--   `aliases` (List[str], optional): List of alternative names
--   `**kwargs`: Additional arguments passed to `click.group()`
-
-**Returns:** `AliasedGroup` instance
+```python
+@rule(["host", "port", "database"], mode="all_or_none")
+@rule(["email", "sms", "slack"], mode="at_least", count=1)
+@rule(["json", "xml", "yaml"], mode="at_most", count=1)
+@rule(["file1", "file2", "file3"], mode="exactly", count=2)
+```
 
 ## Migration from Click
 
-Migrating from standard Click is straightforward:
+Migrating from standard Click is straightforward - just change your imports:
 
 ### Before (Standard Click)
 
@@ -217,23 +234,29 @@ def cli():
     pass
 
 @click.command()
-def deploy():
+@click.option("--name", default="World")
+@click.argument("file")
+def greet(name, file):
     pass
 ```
 
 ### After (Click with Aliasing)
 
 ```python
-from click_with_aliasing import group, command
+from click_with_aliasing import group, command, option, argument
 
 @group(aliases=["c"])
 def cli():
     pass
 
-@command(name="deploy", aliases=["d", "dep"])
-def deploy():
+@command(name="greet", aliases=["g"])
+@option("--name", default="World", mutually_exclusive=["file"])
+@argument("file", required=False, mutually_exclusive=["name"])
+def greet(name, file):
     pass
 ```
+
+All standard Click features work exactly the same, with optional enhancements available.
 
 ## Help Text Integration
 
@@ -253,22 +276,9 @@ Commands:
   seed (s)          Seed the database
 ```
 
-## Troubleshooting
-
-### Common Issues
-
-**Q: My async function isn't working**
-A: The library automatically wraps async functions. Make sure you're using Python 3.10+ and have proper async/await syntax.
-
-**Q: Aliases don't appear in help**
-A: Ensure you're using the `AliasedGroup` class (automatic when using the `@group` decorator).
-
-**Q: Type hints are not working**
-A: Make sure you're importing from `click_with_aliasing` and have the latest version installed.
-
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our development process, coding standards, and how to submit pull requests.
 
 ## License
 

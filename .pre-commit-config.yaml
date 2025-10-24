@@ -6,8 +6,28 @@ repos:
         entry: bash -c 'PYTHONPATH=./ pytest --verbosity=0'
         language: system
         types: [python]
-      - id: pylint
-        name: Run pylint with a minimum score of 9
-        entry: bash -c 'pylint . --fail-under=9'
+        pass_filenames: false
+      - id: mypy
+        name: Run mypy type checking
+        entry: bash -c 'python -m mypy click_with_aliasing'
         language: system
         types: [python]
+        pass_filenames: false
+      - id: pylint
+        name: Run pylint with a minimum score of 9
+        entry: bash -c 'pylint click_with_aliasing --fail-under=9'
+        language: system
+        types: [python]
+        pass_filenames: false
+      - id: black-check
+        name: Check code formatting with black
+        entry: bash -c 'black --check . || (echo "Run black . to fix formatting" && exit 1)'
+        language: system
+        types: [python]
+        pass_filenames: false
+      - id: isort-check
+        name: Check import sorting with isort
+        entry: bash -c 'isort --check-only . || (echo "Run isort . to fix imports" && exit 1)'
+        language: system
+        types: [python]
+        pass_filenames: false
