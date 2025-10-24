@@ -12,16 +12,27 @@
 
 A powerful extension for [Click](https://click.palletsprojects.com/) that adds **command and group aliasing** support with **automatic async function handling** and **advanced parameter validation**.
 
+You can find the project on [PyPi](https://pypi.org/project/click-with-aliasing/).
+
 ## Features
 
 - **Command Aliases**: Create multiple names for your commands
 - **Group Aliases**: Add aliases to command groups
+- **Help Alias (-h)**: Automatic `-h` shorthand for `--help` with conflict detection
 - **Enhanced Options & Arguments**: Mutual exclusivity, requirements, and group constraints
 - **Validation Rules**: Group-level validation with multiple modes (all_or_none, at_least, at_most, exactly)
 - **Automatic Async Support**: Seamlessly handle async functions without extra configuration
 - **Drop-in Replacement**: Works exactly like standard Click decorators
 - **Type Safe**: Full type hints support with proper IDE integration
 - **Help Integration**: Aliases automatically appear in help text
+
+## Installation
+
+```bash
+pip install click-with-aliasing
+```
+
+**Requirements:** Python 3.10 or newer
 
 ## Documentation
 
@@ -31,13 +42,7 @@ A powerful extension for [Click](https://click.palletsprojects.com/) that adds *
 - **[Argument](docs/ARGUMENT.md)** - Enhanced arguments with validation constraints
 - **[Rule](docs/RULE.md)** - Group-level validation rules for complex parameter logic
 
-## Installation
-
-```bash
-pip install click-with-aliasing
-```
-
-**Requirements:** Python 3.10 or newer
+> **Note:** Both `-h` and `--help` flags are supported by default. See the [Command](docs/COMMAND.md) and [Group](docs/GROUP.md) documentation for details on how `-h` is intelligently handled when commands use it for other purposes.
 
 ## Quick Start
 
@@ -134,7 +139,7 @@ Usage:
 my-cli deploy --production                          # Valid
 my-cli deploy --staging                             # Valid
 my-cli deploy --production --staging                # Error: exactly 1 required
-my-cli deploy                                        # Error: exactly 1 required
+my-cli deploy                                       # Error: exactly 1 required
 ```
 
 ## Async Support
@@ -260,7 +265,7 @@ All standard Click features work exactly the same, with optional enhancements av
 
 ## Help Text Integration
 
-Aliases automatically appear in help text:
+Aliases automatically appear in help text, and both `-h` and `--help` work for displaying help:
 
 ```txt
 myapp database --help
@@ -269,12 +274,14 @@ Usage: myapp database [OPTIONS] COMMAND [ARGS]...
   Database management commands
 
 Options:
-  --help  Show this message and exit.
+  -h, --help  Show this message and exit.
 
 Commands:
   migrate (m, mig)  Run database migrations
   seed (s)          Seed the database
 ```
+
+The `-h` flag is automatically added unless a command uses it for another purpose (like `--host`), ensuring consistent help access while avoiding conflicts.
 
 ## Contributing
 

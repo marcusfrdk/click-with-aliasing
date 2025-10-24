@@ -273,6 +273,63 @@ Commands:
   seed (s)          Seed the database
 ```
 
+### Help Flag (-h)
+
+By default, groups support both `-h` and `--help` for displaying help:
+
+```python
+from click_with_aliasing import group
+
+@group()
+def cli():
+    """My CLI application"""
+    pass
+```
+
+```bash
+$ python app.py -h
+Usage: app.py [OPTIONS] COMMAND [ARGS]...
+
+  My CLI application
+
+Options:
+  -h, --help  Show this message and exit.
+```
+
+However, if any command in the group uses `-h` for another purpose, the group will only show `--help`:
+
+```python
+from click_with_aliasing import group, command, option
+
+@group()
+def cli():
+    """Network tools"""
+    pass
+
+@command("ping")
+@option("--host", "-h", required=True, help="Target host")
+def ping(host):
+    """Ping a host"""
+    print(f"Pinging {host}")
+
+cli.add_command(ping)
+```
+
+```bash
+# Group only has --help (not -h) because ping command uses -h
+$ python app.py --help
+Usage: app.py [OPTIONS] COMMAND [ARGS]...
+
+  Network tools
+
+Options:
+  --help  Show this message and exit.
+
+# The ping command uses -h for --host
+$ python app.py ping -h localhost
+Pinging localhost
+```
+
 ## API Reference
 
 ```python

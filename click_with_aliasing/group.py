@@ -23,6 +23,72 @@ class Group(click.Group):
         self.aliases: list[str] = kwargs.pop("aliases", [])
         super().__init__(*args, **kwargs)
 
+    def get_help_option(self, ctx: click.Context) -> click.Option | None:
+        """
+        Get the help option with -h alias support.
+
+        This method adds -h as an alias for --help unless the group itself or
+        any command in the group uses -h for another purpose.
+
+        Args:
+            ctx (click.Context):
+                The Click context.
+
+        Returns:
+            click.Option | None:
+                The help option with -h alias, or None if help is disabled.
+        """
+        help_option_names = self.get_help_option_names(ctx)
+        if not help_option_names:
+            return None
+
+        has_h_conflict = False
+        for param in self.params:
+            if hasattr(param, "opts") and "-h" in param.opts:
+                has_h_conflict = True
+                break
+
+        if not has_h_conflict:
+            for cmd_name, cmd in self.commands.items():
+                if cmd_name == cmd.name:
+                    for param in getattr(cmd, "params", []):
+                        if hasattr(param, "opts") and "-h" in param.opts:
+                            has_h_conflict = True
+                            break
+                if has_h_conflict:
+                    break
+
+        if not has_h_conflict and "-h" not in help_option_names:
+            help_option_names = ["-h"] + list(help_option_names)
+
+        return click.Option(
+            help_option_names,
+            is_flag=True,
+            is_eager=True,
+            expose_value=False,
+            callback=self._show_help_callback,
+            help="Show this message and exit.",
+        )
+
+    @staticmethod
+    def _show_help_callback(
+        ctx: click.Context, param: click.Parameter, value: bool
+    ) -> None:
+        """
+        Callback to show help message.
+
+        Args:
+            ctx (click.Context):
+                The Click context.
+            param (click.Parameter):
+                The parameter that triggered the callback.
+            value (bool):
+                The value of the parameter.
+        """
+        if value and not ctx.resilient_parsing:
+            click.echo(ctx.get_help(), color=ctx.color)
+            ctx.exit()
+
     def add_command(self, cmd: click.Command, name: str | None = None) -> None:
         """
         Add a command to the group, including its aliases.

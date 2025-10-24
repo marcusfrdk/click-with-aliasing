@@ -34,9 +34,9 @@ def deploy():
 All of these work:
 
 ```bash
-$ python app.py deploy
-$ python app.py d
-$ python app.py dep
+python app.py deploy
+python app.py d
+python app.py dep
 ```
 
 ## With Parameters
@@ -177,6 +177,57 @@ cli.add_command(deploy)
 $ python app.py --help
 Commands:
   deploy (d, dep)  Deploy the application to production
+```
+
+### Help Flag (-h)
+
+By default, commands support both `-h` and `--help` for displaying help:
+
+```python
+from click_with_aliasing import command
+
+@command("process")
+def process():
+    """Process data"""
+    print("Processing...")
+```
+
+```bash
+$ python app.py process -h
+Usage: app.py process [OPTIONS]
+
+  Process data
+
+Options:
+  -h, --help  Show this message and exit.
+```
+
+However, if a command uses `-h` for another option, it will not have `-h` as a help alias:
+
+```python
+from click_with_aliasing import command, option
+
+@command("connect")
+@option("--host", "-h", help="Server hostname")
+def connect(host):
+    """Connect to a server"""
+    print(f"Connecting to {host}")
+```
+
+```bash
+# -h is used for --host option
+$ python app.py connect -h localhost
+Connecting to localhost
+
+# Help is available via --help only
+$ python app.py connect --help
+Usage: app.py connect [OPTIONS]
+
+  Connect to a server
+
+Options:
+  -h, --host TEXT  Server hostname
+  --help           Show this message and exit.
 ```
 
 ## API Reference
