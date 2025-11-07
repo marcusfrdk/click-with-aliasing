@@ -20,7 +20,6 @@ You can find the project on [PyPi](https://pypi.org/project/click-with-aliasing/
 - **Group Aliases**: Add aliases to command groups
 - **Help Alias (-h)**: Automatic `-h` shorthand for `--help` with conflict detection
 - **Enhanced Options & Arguments**: Mutual exclusivity, requirements, and group constraints
-- **Validation Rules**: Group-level validation with multiple modes (all_or_none, at_least, at_most, exactly)
 - **Automatic Async Support**: Seamlessly handle async functions without extra configuration
 - **Drop-in Replacement**: Works exactly like standard Click decorators
 - **Type Safe**: Full type hints support with proper IDE integration
@@ -40,7 +39,6 @@ pip install click-with-aliasing
 - **[Group](docs/GROUP.md)** - Group decorator for organizing commands
 - **[Option](docs/OPTION.md)** - Enhanced options with mutual exclusivity and requirements
 - **[Argument](docs/ARGUMENT.md)** - Enhanced arguments with validation constraints
-- **[Rule](docs/RULE.md)** - Group-level validation rules for complex parameter logic
 
 > **Note:** Both `-h` and `--help` flags are supported by default. See the [Command](docs/COMMAND.md) and [Group](docs/GROUP.md) documentation for details on how `-h` is intelligently handled when commands use it for other purposes.
 
@@ -117,31 +115,6 @@ my-cli auth --username admin                        # Error: requires password
 my-cli auth --token abc123 --username admin         # Error: mutually exclusive
 ```
 
-### Validation Rules
-
-```python
-from click_with_aliasing import command, option, rule
-
-@command(name="deploy")
-@option("--production", is_flag=True)
-@option("--staging", is_flag=True)
-@option("--development", is_flag=True)
-@rule(["production", "staging", "development"], mode="exactly", count=1)
-def deploy(production, staging, development):
-    """Deploy to exactly one environment"""
-    env = "production" if production else "staging" if staging else "development"
-    print(f"Deploying to {env}")
-```
-
-Usage:
-
-```bash
-my-cli deploy --production                          # Valid
-my-cli deploy --staging                             # Valid
-my-cli deploy --production --staging                # Error: exactly 1 required
-my-cli deploy                                       # Error: exactly 1 required
-```
-
 ## Async Support
 
 The library automatically detects and handles async functions, meaning no extra configuration is needed.
@@ -207,22 +180,6 @@ Add multiple names to commands and groups for convenience:
 
 ```python
 @option("--json", group="format", group_mutually_exclusive=["output"])
-```
-
-### Validation Rules
-
-Apply group-level validation with different modes:
-
-- **all_or_none**: All parameters or none
-- **at_least**: Minimum number required
-- **at_most**: Maximum number allowed
-- **exactly**: Exact number required
-
-```python
-@rule(["host", "port", "database"], mode="all_or_none")
-@rule(["email", "sms", "slack"], mode="at_least", count=1)
-@rule(["json", "xml", "yaml"], mode="at_most", count=1)
-@rule(["file1", "file2", "file3"], mode="exactly", count=2)
 ```
 
 ## Migration from Click
