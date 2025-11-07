@@ -2,9 +2,11 @@
 
 import asyncio
 import functools
-from typing import Any, Callable
+from typing import Any, Callable, TypeVar, overload
 
 import click
+
+F = TypeVar("F", bound=Callable[..., Any])
 
 
 class Command(click.Command):
@@ -42,14 +44,12 @@ class Command(click.Command):
         if not help_option_names:
             return None
 
-        # Check if this command uses -h for another purpose
         has_h_conflict = False
         for param in self.params:
             if hasattr(param, "opts") and "-h" in param.opts:
                 has_h_conflict = True
                 break
 
-        # Add -h to help option names if no conflict
         if not has_h_conflict and "-h" not in help_option_names:
             help_option_names = ["-h"] + list(help_option_names)
 
@@ -82,18 +82,49 @@ class Command(click.Command):
             ctx.exit()
 
 
+@overload
+def command(fn: Callable[..., Any], /) -> Command: ...
+
+
+@overload
 def command(
-    name: str,
+    name: str | None = None,
     *args: Any,
     aliases: list[str] | None = None,
     **kwargs: Any,
-) -> Callable[[Callable[..., Any]], Command]:
+) -> Callable[[Callable[..., Any]], Command]: ...
+
+
+def command(  # type: ignore[misc]
+    name_or_fn: str | Callable[..., Any] | None = None,
+    *args: Any,
+    aliases: list[str] | None = None,
+    **kwargs: Any,
+) -> Any:
     """
     Create a command decorator with aliasing support.
 
+    Can be used with or without arguments:
+        @command
+        def my_func():
+            pass
+
+        @command()
+        def my_func():
+            pass
+
+        @command("custom-name")
+        def my_func():
+            pass
+
+        @command(name="custom-name", aliases=["alias1"])
+        def my_func():
+            pass
+
     Args:
-        name (str):
-            The name of the command.
+        name_or_fn (str | Callable[..., Any], optional):
+            The name of the command or the function being decorated.
+            If not provided, the function name will be used.
         aliases (List[str], optional):
             List of alternative names for the command.
         *args (Any):
@@ -102,12 +133,20 @@ def command(
             Additional keyword arguments passed to click.command.
 
     Returns:
-        Callable[[Callable[..., Any]], Command]:
-            A decorator function that takes a command function and returns a
-            Command instance with the specified configuration.
+        Command | Callable[[Callable[..., Any]], Command]:
+            Either a Command instance (when used without parentheses) or
+            a decorator function that returns a Command instance.
 
     Examples:
-        @command(name="my_command")
+        @command
+        def my_command():
+            pass
+
+        @command()
+        def my_command():
+            pass
+
+        @command("my_command")
         def cmd():
             pass
 
@@ -116,7 +155,9 @@ def command(
             pass
     """
 
-    def decorator(fn: Callable[..., Any]) -> Command:
+    def decorator(
+        fn: Callable[..., Any], cmd_name: str | None = None
+    ) -> Command:
         original_fn = fn
 
         if asyncio.iscoroutinefunction(fn):
@@ -127,9 +168,16 @@ def command(
 
             fn = sync_wrapper
 
-        command_decorator = click.command(name=name, cls=Command, **kwargs)
+        final_name = cmd_name if cmd_name is not None else fn.__name__
+        command_decorator = click.command(
+            name=final_name, cls=Command, **kwargs
+        )
         cmd = command_decorator(fn)
         cmd.aliases = aliases or []
         return cmd
 
-    return decorator
+    if callable(name_or_fn):
+        return decorator(name_or_fn)
+
+    name = name_or_fn if isinstance(name_or_fn, str) else None
+    return lambda fn: decorator(fn, name)
