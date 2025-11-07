@@ -2,6 +2,11 @@
 
 # Click With Aliasing
 
+![Python Version](https://img.shields.io/pypi/pyversions/click-with-aliasing)
+![Tests](https://github.com/marcusfrdk/click-with-aliasing/actions/workflows/test.yml/badge.svg)
+![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)
+![Documentation](https://img.shields.io/badge/docs-available-brightgreen)
+![Type Checker](https://img.shields.io/badge/type_checker-mypy-blue)
 ![top language](https://img.shields.io/github/languages/top/marcusfrdk/click-with-aliasing)
 ![code size](https://img.shields.io/github/languages/code-size/marcusfrdk/click-with-aliasing)
 ![last commit](https://img.shields.io/github/last-commit/marcusfrdk/click-with-aliasing)
